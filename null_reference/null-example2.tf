@@ -1,0 +1,23 @@
+provider "aws" {
+  region     = "us-east-1"
+  access_key = "XXXX"
+  secret_key = "XXXX"
+}
+
+resource "aws_eip" "lb" {
+    vpc = true
+    count = 3
+}
+
+resource "null_resource" "ip_check" {
+
+
+    triggers = {
+      latest_ips = join(", ",aws_eip.lb[*].public_ip)
+    }
+
+    provisioner "local-exec" {
+        command = "echo Latest IP's are ${null_resource.ip_check.triggers.latest_ips} > sample.txt"
+    }
+
+}
